@@ -35,9 +35,11 @@ jfloat OverrideUIScale = -1.0f;
 int DEFAULT_DPI = 96;
 
 static guint get_current_desktop(GdkScreen *screen) {
+fprintf(stderr, "gcd\n");
     Display* display = gdk_x11_display_get_xdisplay(gdk_display_get_default());
     Atom currentDesktopAtom = XInternAtom(display, "_NET_CURRENT_DESKTOP", True);
     guint ret = 0;
+fprintf(stderr, "gcd done\n");
 
     Atom type;
     int format;
@@ -66,6 +68,10 @@ static guint get_current_desktop(GdkScreen *screen) {
 }
 
 static GdkRectangle get_screen_workarea(GdkScreen *screen) {
+#ifdef WAYLAND
+    GdkRectangle ret = { 0, 0, gdk_screen_get_width(screen), gdk_screen_get_height(screen)};
+    return ret;
+#else
     Display* display = gdk_x11_display_get_xdisplay(gdk_display_get_default());
     GdkRectangle ret = { 0, 0, gdk_screen_get_width(screen), gdk_screen_get_height(screen)};
 
@@ -100,6 +106,7 @@ static GdkRectangle get_screen_workarea(GdkScreen *screen) {
     }
 
     return ret;
+#endif
 
 }
 
@@ -128,11 +135,14 @@ jfloat getUIScale(GdkScreen* screen) {
 
 static jobject createJavaScreen(JNIEnv* env, GdkScreen* screen, gint monitor_idx)
 {
+fprintf(stderr, "cjs0\n");
     GdkRectangle workArea = get_screen_workarea(screen);
     LOG4("Work Area: x:%d, y:%d, w:%d, h:%d\n", workArea.x, workArea.y, workArea.width, workArea.height);
+fprintf(stderr, "cjs1\n");
 
     GdkRectangle monitor_geometry;
     gdk_screen_get_monitor_geometry(screen, monitor_idx, &monitor_geometry);
+fprintf(stderr, "cjs2\n");
     LOG1("convert monitor[%d] -> glass Screen\n", monitor_idx)
     LOG4("[x: %d y: %d w: %d h: %d]\n",
          monitor_geometry.x, monitor_geometry.y,
@@ -155,6 +165,7 @@ static jobject createJavaScreen(JNIEnv* env, GdkScreen* screen, gint monitor_idx
     jint ww = working_monitor_geometry.width / uiScale;
     jint wh = working_monitor_geometry.height / uiScale;
 
+fprintf(stderr, "cjs3\n");
     gint mmW = gdk_screen_get_monitor_width_mm(screen, monitor_idx);
     gint mmH = gdk_screen_get_monitor_height_mm(screen, monitor_idx);
     if (mmW <= 0 || mmH <= 0) {
@@ -163,6 +174,7 @@ static jobject createJavaScreen(JNIEnv* env, GdkScreen* screen, gint monitor_idx
             mmH = gdk_screen_get_height_mm(screen);
         }
     }
+fprintf(stderr, "cjs4\n");
     jint dpiX, dpiY;
     if (mmW <= 0 || mmH <= 0) {
         dpiX = dpiY = 96;
@@ -189,6 +201,7 @@ static jobject createJavaScreen(JNIEnv* env, GdkScreen* screen, gint monitor_idx
                                      uiScale, uiScale, uiScale, uiScale);
 
     JNI_EXCEPTION_TO_CPP(env);
+fprintf(stderr, "cjs1\n");
     return jScreen;
 }
 
@@ -202,8 +215,11 @@ jobject createJavaScreen(JNIEnv* env, gint monitor_idx) {
 }
 
 jobjectArray rebuild_screens(JNIEnv* env) {
+fprintf(stderr, "Rebuilds0\n");
     GdkScreen *default_gdk_screen = gdk_screen_get_default();
+fprintf(stderr, "Rebuilds1\n");
     gint n_monitors = gdk_screen_get_n_monitors(default_gdk_screen);
+fprintf(stderr, "Rebuilds2\n");
 
     jobjectArray jscreens = env->NewObjectArray(n_monitors, jScreenCls, NULL);
     JNI_EXCEPTION_TO_CPP(env)
@@ -214,6 +230,7 @@ jobjectArray rebuild_screens(JNIEnv* env) {
         env->SetObjectArrayElement(jscreens, i, createJavaScreen(env, default_gdk_screen, i));
         JNI_EXCEPTION_TO_CPP(env)
     }
+fprintf(stderr, "Rebuildsn\n");
 
     return jscreens;
 }

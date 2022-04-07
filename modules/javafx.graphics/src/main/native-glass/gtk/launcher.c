@@ -196,14 +196,20 @@ JNIEXPORT jint JNICALL Java_com_sun_glass_ui_gtk_GtkApplication__1queryLibrary
     gtk_versionDebug = verbose;
 
     //Set the gtk backend to x11 on all the systems
+#ifdef WAYLAND
+    putenv("GDK_BACKEND=wayland");
+#else
     putenv("GDK_BACKEND=x11");
+#endif
 
     // Before doing anything with GTK we validate that the DISPLAY can be opened
+#ifndef WAYLAND
     Display *display = XOpenDisplay(NULL);
     if (display == NULL) {
         return com_sun_glass_ui_gtk_GtkApplication_QUERY_NO_DISPLAY;
     }
     XCloseDisplay(display);
+#endif
 
     // now check the the presence of the libraries
 

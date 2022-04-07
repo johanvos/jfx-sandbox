@@ -81,9 +81,11 @@ JNIEXPORT jlong JNICALL Java_com_sun_glass_ui_gtk_GtkWindow__1createWindow
   (JNIEnv * env, jobject obj, jlong owner, jlong screen, jint mask)
 {
     (void)env;
+fprintf(stderr, "CW0\n");
 
     WindowContext* parent = JLONG_TO_WINDOW_CTX(owner);
 
+fprintf(stderr, "CW1\n");
     WindowContext* ctx = new WindowContextTop(obj,
             parent,
             screen,
@@ -92,6 +94,7 @@ JNIEXPORT jlong JNICALL Java_com_sun_glass_ui_gtk_GtkWindow__1createWindow
             glass_mask_to_wm_function(mask)
             );
 
+fprintf(stderr, "CWn\n");
     return PTR_TO_JLONG(ctx);
 }
 

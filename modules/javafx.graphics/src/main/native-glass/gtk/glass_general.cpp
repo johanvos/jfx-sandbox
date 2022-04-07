@@ -844,10 +844,12 @@ void glass_gdk_x11_display_set_window_scale (GdkDisplay *display,
                           gint scale)
 {
 #ifdef GLASS_GTK3
+#ifndef WAYLAND
     // Optional call, if it does not exist then GTK3 is not yet
     // doing automatic scaling of coordinates so we do not need
     // to override it.
     wrapped_gdk_x11_display_set_window_scale(display, scale);
+#endif
 #else
     (void) display;
     (void) scale;

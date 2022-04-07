@@ -22,6 +22,9 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+#ifdef WAYLAND
+#include <gdk/gdkwayland.h>
+#endif
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdk.h>
@@ -136,11 +139,17 @@ JNIEXPORT jint JNICALL Java_com_sun_glass_ui_gtk_GtkApplication__1queryLibrary
     (void)suggestedVersion;
     (void)verbose;
 
+#ifdef WAYLAND
+    wl_display *display = gdk_wayland_display_get_wl_display(NULL);
+#else
     Display *display = XOpenDisplay(NULL);
+#endif
     if (display == NULL) {
         return com_sun_glass_ui_gtk_GtkApplication_QUERY_NO_DISPLAY;
     }
+#ifndef WAYLAND
     XCloseDisplay(display);
+#endif
 
     return com_sun_glass_ui_gtk_GtkApplication_QUERY_USE_CURRENT;
 }

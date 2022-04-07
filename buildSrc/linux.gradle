@@ -229,9 +229,9 @@ FileTree ft_gtk = fileTree("${project(":graphics").projectDir}/src/main/native-g
 LINUX.glass.glass = [:]
 LINUX.glass.glass.nativeSource = ft_gtk_launcher.getFiles()
 LINUX.glass.glass.compiler = compiler
-LINUX.glass.glass.ccFlags = [cppFlags, "-Werror"].flatten()
+LINUX.glass.glass.ccFlags = [cppFlags, "-Werror", "-DWAYLAND"].flatten()
 LINUX.glass.glass.linker = linker
-LINUX.glass.glass.linkFlags = IS_STATIC_BUILD? linkFlags : [linkFlags, "-lX11", "-ldl"].flatten()
+LINUX.glass.glass.linkFlags = IS_STATIC_BUILD? linkFlags : [linkFlags, "-ldl"].flatten()
 LINUX.glass.glass.lib = "glass"
 
 LINUX.glass.glassgtk2 = [:]
@@ -249,7 +249,7 @@ LINUX.glass.glassgtk3.nativeSource =  ft_gtk.getFiles()
 LINUX.glass.glassgtk3.compiler = compiler
 LINUX.glass.glassgtk3.ccFlags = IS_STATIC_BUILD ?
         ["-fno-threadsafe-statics", cppFlags, gtk3CCFlags].flatten() :
-        [cppFlags, gtk3CCFlags, "-Werror"].flatten()
+        [cppFlags, gtk3CCFlags, "-Werror", "-DWAYLAND"].flatten()
 LINUX.glass.glassgtk3.linker = linker
 LINUX.glass.glassgtk3.linkFlags = IS_STATIC_BUILD ? linkFlags : [linkFlags, gtk3LinkFlags].flatten()
 LINUX.glass.glassgtk3.lib = "glassgtk3"
@@ -296,7 +296,7 @@ LINUX.prismES2.nativeSource = [
 LINUX.prismES2.compiler = compiler
 LINUX.prismES2.ccFlags = ["-DLINUX", cFlags].flatten()
 LINUX.prismES2.linker = linker
-LINUX.prismES2.linkFlags =IS_STATIC_BUILD ? linkFlags : [linkFlags, "-lX11", "-lXxf86vm", "-lGL"].flatten()
+LINUX.prismES2.linkFlags =IS_STATIC_BUILD ? linkFlags : [linkFlags, "-lGL"].flatten()
 LINUX.prismES2.lib = "prism_es2"
 
 def closedDir = file("$projectDir/../rt-closed")

@@ -800,8 +800,12 @@ get_net_frame_extents_atom() {
 
 void
 WindowContextTop::request_frame_extents() {
+fprintf(stderr, "Request frame extents 0\n");
     Display *display = GDK_DISPLAY_XDISPLAY(gdk_window_get_display(gdk_window));
+fprintf(stderr, "Request frame extents 1\n");
+#ifndef WAYLAND
     Atom rfeAtom = XInternAtom(display, "_NET_REQUEST_FRAME_EXTENTS", True);
+fprintf(stderr, "Request frame extents 2\n");
     if (rfeAtom != None) {
         XClientMessageEvent clientMessage;
         memset(&clientMessage, 0, sizeof(clientMessage));
@@ -816,11 +820,14 @@ WindowContextTop::request_frame_extents() {
                    (XEvent *) &clientMessage);
         XFlush(display);
     }
+#endif
 }
 
 void WindowContextTop::activate_window() {
+fprintf(stderr, "activate_window 0\n");
     Display *display = GDK_DISPLAY_XDISPLAY (gdk_window_get_display (gdk_window));
     Atom navAtom = XInternAtom(display, "_NET_ACTIVE_WINDOW", True);
+fprintf(stderr, "activate_window 1\n");
     if (navAtom != None) {
         XClientMessageEvent clientMessage;
         memset(&clientMessage, 0, sizeof(clientMessage));
